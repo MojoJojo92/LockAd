@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">LockAd</string>
-
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="instructions">Click on UNLOCK button to unlock the screen</string>
+    <string name="unlock">UNLOCK</string>
 </resources>
