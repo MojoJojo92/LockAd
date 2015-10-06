@@ -27,8 +27,8 @@ public class MainActivity extends Activity implements LockscreenUtils.OnLockStat
     private LockscreenUtils mLockscreenUtils;
 
 
-    // Set appropriate flags to make the screen appear over the keyguard
-    @Override
+   // Set appropriate flags to make the screen appear over the keyguard
+   /* @Override
     public void onAttachedToWindow() {
         this.getWindow().setType(
                 WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
@@ -40,49 +40,44 @@ public class MainActivity extends Activity implements LockscreenUtils.OnLockStat
         );
 
         super.onAttachedToWindow();
-    }
+    } */
 
-  /*  @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    } */
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
 
-      setContentView(R.layout.activity_main);
+        init();
 
-      init();
+        // unlock screen in case of app get killed by system
+        if (getIntent() != null && getIntent().hasExtra("kill")
+                && getIntent().getExtras().getInt("kill") == 1) {
+            enableKeyguard();
+            unlockHomeButton();
+        } else {
 
-      // unlock screen in case of app get killed by system
-      if (getIntent() != null && getIntent().hasExtra("kill")
-              && getIntent().getExtras().getInt("kill") == 1) {
-          enableKeyguard();
-          unlockHomeButton();
-      } else {
+            try {
+                // disable keyguard
+                disableKeyguard();
 
-          try {
-              // disable keyguard
-              disableKeyguard();
+                // lock home button
+                lockHomeButton();
 
-              // lock home button
-              lockHomeButton();
+                // start service for observing intents
+                startService(new Intent(this, LockscreenService.class));
 
-              // start service for observing intents
-              startService(new Intent(this, LockscreenService.class));
+                // listen the events get fired during the call
+                StateListener phoneStateListener = new StateListener();
+                TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+                telephonyManager.listen(phoneStateListener,
+                        PhoneStateListener.LISTEN_CALL_STATE);
 
-              // listen the events get fired during the call
-              StateListener phoneStateListener = new StateListener();
-              TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-              telephonyManager.listen(phoneStateListener,
-                      PhoneStateListener.LISTEN_CALL_STATE);
+            } catch (Exception e) {
+            }
 
-          } catch (Exception e) {
-          }
+        }
+    }
 
-      }
-  }
     private void init() {
         mLockscreenUtils = new LockscreenUtils();
         btnUnlock = (Button) findViewById(R.id.btnUnlock);
